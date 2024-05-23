@@ -14,6 +14,9 @@ for json_file in os.listdir(json_dir):
         with open(os.path.join(json_dir, json_file)) as f:
             data.append(json.load(f))
 
+# Normalize nested fields
+df = pd.json_normalize(data)
+
 # Create a DataFrame from the data
 df = pd.DataFrame(data)
 
