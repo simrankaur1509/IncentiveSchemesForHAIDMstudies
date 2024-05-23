@@ -1,0 +1,25 @@
+name: Convert JSON to HTML Table
+
+on:
+  push:
+    branches:
+      - main  # Adjust this branch as needed
+
+jobs:
+  convert-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Convert JSON to HTML Table
+        uses: Teebra/JSON-to-HTML-table@v2.0.0
+        with:
+          json-file: IncentiveSchemesTemplate.json  # Specify the path to your JSON file
+
+      - name: Upload HTML Table to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: output_html 
+          path: output.html # The created file's name is output.html. Name cannot be changed
