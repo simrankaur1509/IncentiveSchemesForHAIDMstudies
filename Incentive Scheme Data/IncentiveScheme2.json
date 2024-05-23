@@ -1,0 +1,33 @@
+{
+    "title": "Dealing with Uncertainty: Understanding the Impact of Prognostic Versus Diagnostic Tasks on Trust and Reliance in Human-AI Decision-Making",
+    "authors": "Sara Salimzadeh, Gaole He, and Ujwal Gadiraju",
+    "venue": "CHI",
+    "year": "2024",
+    "taskDomain": "Trip planning",
+    "participantInfo": "258, Prolific, native English speakers, min. approval 95%, >= 100 completed studies.",
+    "incentiveScheme": {
+        "basePay": {
+            "amount": {
+                "perHour": "8 GBP",
+                "perTask": "-",
+                "perParticipant": "-"
+            },
+            "rationales": ["Exceeds minimum wage"]
+        },
+        "bonus": {
+            "amount": {
+                "maximum": "-",
+                "average": "-"
+            },
+            "type(s)": ["Performance-based"],
+            "evaluationMetric(s)": ["Accuracy"],
+            "mappingPolicy": "0.2 GBP per correct response",
+            "rationales": ["-"]
+        },
+        "resultantPay": {
+            "average": "8.44 GBP",
+            "median": "-"
+        },
+        "incentiveSchemeAsReported": "On average, participants took approximately 25 minutes to complete the entire study. All participants were compensated at the fixed rate of 8 GBP per hour regardless of their performance in the study. Additionally, participants received bonus rewards amounting to 0.2 GBP for each accurate response they provided during the study period. Overall, participants earned an average of 8.44 GBP per hour, well over the wage considered to be 'good' and recommended by the Prolific platform."
+    }
+}

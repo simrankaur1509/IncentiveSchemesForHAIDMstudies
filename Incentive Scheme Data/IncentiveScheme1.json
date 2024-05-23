@@ -1,0 +1,33 @@
+{
+    "title": "How do you feel? Measuring User-Perceived Value for Rejecting Machine Decisions in Hate Speech Detection",
+    "authors": "Philippe Lammerts, Philip Lippmann, Yen-Chia Hsu, Fabio Casati, and Jie Yang",
+    "venue": "AIES",
+    "year": "2023",
+    "taskDomain": "Hate speech detection",
+    "participantInfo": "160 participants, Prolific (18+, fluent in English, approval rating > 90%), experience using social media",
+    "incentiveScheme": {
+        "basePay": {
+            "amount": {
+                "perHour": "£9",
+                "perTask": "-",
+                "perParticipant": "-"
+            },
+            "rationales": ["Exceeds minimum wage"]
+        },
+        "bonus": {
+            "amount": {
+                "maximum": "-",
+                "average": "-"
+            },
+            "type(s)": ["-"],
+            "evaluationMetric(s)": ["-"],
+            "mappingPolicy": "-",
+            "rationales": ["-"]
+        },
+        "resultantPay": {
+            "average": "-",
+            "median": "-"
+        },
+        "incentiveSchemeAsReported": "Every participant is paid an hourly wage of 9 GBP, exceeding the UK minimum wage at the time of the study."
+    }
+}
