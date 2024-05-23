@@ -3,7 +3,7 @@ import json
 import pandas as pd
 
 # Directory where JSON files are stored
-json_dir = 'path_to_json_files_directory'
+json_dir = 'Incentive Scheme Data'
 
 # List to hold data from each JSON file
 data = []
@@ -21,5 +21,5 @@ df = pd.DataFrame(data)
 html_table = df.to_html(index=False)
 
 # Write HTML table to file
-with open('records_table.html', 'w') as f:
+with open('index.html', 'w') as f:
     f.write(html_table)
