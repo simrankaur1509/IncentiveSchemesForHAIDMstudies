@@ -1,0 +1,33 @@
+{
+    "title": "",
+    "authors": "",
+    "venue": "",
+    "year": "",
+    "taskDomain": "",
+    "participantInfo": "",
+    "incentiveScheme": {
+        "basePay": {
+            "amount": {
+                "perHour": "",
+                "perTask": "",
+                "perParticipant": ""
+            },
+            "rationales": []
+        },
+        "bonus": {
+            "amount": {
+                "maximum": "",
+                "average": ""
+            },
+            "type(s)": [],
+            "evaluationMetric(s)": [],
+            "mappingPolicy": "",
+            "rationales": []
+        },
+        "resultantPay": {
+            "average": "",
+            "median": ""
+        },
+        "incentiveSchemeAsReported": ""
+    }
+}
