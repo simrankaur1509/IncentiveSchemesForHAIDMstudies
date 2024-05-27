@@ -38,23 +38,12 @@ def generate_html_table(data):
     html = '''
     <html>
     <head>
-        <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        </style>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+        <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
     </head>
     <body>
-    <table>
+    <table id="example" class="display" style="width:100%">
     '''
     
     # Generate header rows
@@ -64,7 +53,7 @@ def generate_html_table(data):
         if subkeys:
             for subkey, nested_subkeys in subkeys.items():
                 if nested_subkeys:
-                    col_span = count_nested_keys(nested_subkeys)
+                    col_span = len(nested_subkeys)
                     html += f'<th colspan="{col_span}">{key}.{subkey}</th>'
                 else:
                     html += f'<th>{key}.{subkey}</th>'
@@ -77,7 +66,8 @@ def generate_html_table(data):
         if subkeys:
             for subkey, nested_subkeys in subkeys.items():
                 if nested_subkeys:
-                    html += generate_nested_header(subkey, nested_subkeys)
+                    for nested_subkey in nested_subkeys.keys():
+                        html += f'<th>{nested_subkey}</th>'
                 else:
                     html += f'<th>{subkey}</th>'
         else:
@@ -93,7 +83,9 @@ def generate_html_table(data):
             if subkeys:
                 for subkey, nested_subkeys in subkeys.items():
                     if nested_subkeys:
-                        html += generate_nested_cells(record, [key, subkey], nested_subkeys)
+                        for nested_subkey in nested_subkeys.keys():
+                            nested_record = get_nested_record(record, [key, subkey])
+                            html += f'<td>{nested_record.get(nested_subkey, "")}</td>'
                     else:
                         nested_record = record.get(key, {})
                         html += f'<td>{nested_record.get(subkey, "")}</td>'
@@ -104,37 +96,19 @@ def generate_html_table(data):
     
     html += '''
     </table>
+    <script>
+    $(document).ready(function() {
+        $('#example').DataTable({
+            "columnDefs": [
+                { "orderable": true, "targets": [2, 3] },  // "year" and "venue" columns (adjust indices if necessary)
+                { "orderable": false, "targets": "_all" }
+            ]
+        });
+    });
+    </script>
     </body>
     </html>
     '''
-    return html
-
-def count_nested_keys(nested_dict):
-    count = 0
-    for key, value in nested_dict.items():
-        if isinstance(value, dict):
-            count += count_nested_keys(value)
-        else:
-            count += 1
-    return count
-
-def generate_nested_header(parent_key, nested_dict):
-    html = ''
-    for key, value in nested_dict.items():
-        if isinstance(value, dict):
-            html += generate_nested_header(f"{parent_key}.{key}", value)
-        else:
-            html += f'<th>{key}</th>'
-    return html
-
-def generate_nested_cells(record, keys, nested_dict):
-    nested_record = get_nested_record(record, keys)
-    html = ''
-    for key, value in nested_dict.items():
-        if isinstance(value, dict):
-            html += generate_nested_cells(nested_record, keys + [key], value)
-        else:
-            html += f'<td>{nested_record.get(key, "")}</td>'
     return html
 
 def get_nested_record(record, keys):
