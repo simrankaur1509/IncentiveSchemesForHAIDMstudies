@@ -60,8 +60,9 @@ def generate_html_table(data):
     $(document).ready(function() {
         $('#example').DataTable({
             "columnDefs": [
-                { "type": "num", "targets": 3 },  // Adjust the index for "year"
-                { "type": "string", "targets": 2 }  // Adjust the index for "venue"
+                { "orderable": true, "targets": headers.index("year") },
+                { "orderable": true, "targets": headers.index("venue") },
+                { "orderable": false, "targets": "_all" }
             ]
         });
     });
