@@ -9,142 +9,96 @@ data = []
 
 # Iterate over all JSON files and read data
 for json_file in os.listdir(json_dir):
-    if json_file.endswith('.json'):
-        with open(os.path.join(json_dir, json_file)) as f:
-            data.append(json.load(f))
-
-def extract_headers(data):
-    headers = {}
-
-    def add_to_headers(d, parent_key=''):
-        for k, v in d.items():
-            full_key = f"{parent_key}.{k}" if parent_key else k
-            if isinstance(v, dict):
-                if parent_key not in headers:
-                    headers[parent_key] = {}
-                headers[parent_key][k] = {}
-                add_to_headers(v, full_key)
-            else:
-                if parent_key not in headers:
-                    headers[parent_key] = {}
-                headers[parent_key][k] = None
-    
-    add_to_headers(data[0])
-    return headers
+  if json_file.endswith('.json'):
+    with open(os.path.join(json_dir, json_file)) as f:
+      data.append(json.load(f))
 
 def generate_html_table(data):
-    headers = extract_headers(data)
-    
-    html = '''
-    <html>
-    <head>
-        <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        </style>
-    </head>
-    <body>
-    <table>
-    '''
-    
-    # Generate header rows
-    html += '<thead>'
-    html += '<tr>'
-    for key, subkeys in headers.items():
-        if subkeys:
-            for subkey, nested_subkeys in subkeys.items():
-                if nested_subkeys:
-                    col_span = count_nested_keys(nested_subkeys)
-                    html += f'<th colspan="{col_span}">{key}.{subkey}</th>'
-                else:
-                    html += f'<th>{key}.{subkey}</th>'
-        else:
-            html += f'<th>{key}</th>'
-    html += '</tr>'
-    
-    html += '<tr>'
-    for key, subkeys in headers.items():
-        if subkeys:
-            for subkey, nested_subkeys in subkeys.items():
-                if nested_subkeys:
-                    html += generate_nested_header(subkey, nested_subkeys)
-                else:
-                    html += f'<th>{subkey}</th>'
-        else:
-            html += f'<th>{key}</th>'
-    html += '</tr>'
-    html += '</thead>'
-    
-    # Generate table rows
+  html = '''
+  <html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+  </head>
+  <body>
+  <table id="example" class="display" style="width:100%">
+  '''
+
+  # Recursive function to generate nested headers and data
+  def generate_nested_headers_and_data(data, current_path=""):
+    html = ""
+    # Top-level header row
+    if current_path == "":
+      for key in data[0].keys():
+        html += f'<th>{key}</th>'
+    else:
+      # Nested header row(s)
+      # Identify unique nested key levels
+      nested_key_levels = set([len(key.split(".")) for key in get_all_nested_keys(data[0], current_path)])
+      # Generate headers for each level
+      for level in sorted(nested_key_levels, reverse=True):
+        html += '<tr>'
+        for key in data[0].keys():
+          if len(key.split(".")) == level:
+            # Extract key part without path
+            key_part = key.split(".")[-1]
+            html += f'<th>{key_part}</th>'
+          else:
+            html += f'<th></th>'  # Placeholder for nested data cells
+        html += '</tr>'
+
+    # Rows
     html += '<tbody>'
     for record in data:
-        html += '<tr>'
-        for key, subkeys in headers.items():
-            if subkeys:
-                for subkey, nested_subkeys in subkeys.items():
-                    if nested_subkeys:
-                        html += generate_nested_cells(record, [key, subkey], nested_subkeys)
-                    else:
-                        nested_record = record.get(key, {})
-                        html += f'<td>{nested_record.get(subkey, "")}</td>'
-            else:
-                html += f'<td>{record.get(key, "")}</td>'
-        html += '</tr>'
+      html += '<tr>'
+      for key in record.keys():
+        nested_value = record.get(key)
+        if isinstance(nested_value, dict):
+          # Nested table for nested data
+          colspan = len(get_all_nested_keys(nested_value, current_path + "." + key))
+          html += f'<td colspan="{colspan}">'
+          html += generate_nested_headers_and_data(list(nested_value.values()), current_path + "." + key)
+          html += '</td>'
+        else:
+          html += f'<td>{nested_value}</td>'
+      html += '</tr>'
     html += '</tbody>'
-    
-    html += '''
-    </table>
-    </body>
-    </html>
-    '''
     return html
 
-def count_nested_keys(nested_dict):
-    count = 0
-    for key, value in nested_dict.items():
-        if isinstance(value, dict):
-            count += count_nested_keys(value)
-        else:
-            count += 1
-    return count
+  # Function to get all nested keys (including current path)
+  def get_all_nested_keys(data, current_path):
+    nested_keys = []
+    for key, value in data.items():
+      nested_keys.append(current_path + "." + key)
+      if isinstance(value, dict):
+        nested_keys.extend(get_all_nested_keys(value, current_path + "." + key))
+    return nested_keys
 
-def generate_nested_header(parent_key, nested_dict):
-    html = ''
-    for key, value in nested_dict.items():
-        if isinstance(value, dict):
-            html += generate_nested_header(f"{parent_key}.{key}", value)
-        else:
-            html += f'<th>{key}</th>'
-    return html
+  # Generate nested headers and data
+  html += generate_nested_headers_and_data(data)
 
-def generate_nested_cells(record, keys, nested_dict):
-    nested_record = get_nested_record(record, keys)
-    html = ''
-    for key, value in nested_dict.items():
-        if isinstance(value, dict):
-            html += generate_nested_cells(nested_record, keys + [key], value)
-        else:
-            html += f'<td>{nested_record.get(key, "")}</td>'
-    return html
-
-def get_nested_record(record, keys):
-    for key in keys:
-        record = record.get(key, {})
-    return record
+  html += '''
+  </table>
+  <script>
+  $(document).ready(function() {
+    $('#example').DataTable({
+      "columnDefs": [
+        { "orderable": true, "targets": 0 },  # Assuming year is in first column
+        { "orderable": true, "targets": 1 },  # Assuming venue is in second column
+        { "orderable": false, "targets": "_all" }  # Make others non-sortable by default
+      ]
+    });
+  });
+  </script>
+  </body>
+  </html>
+  '''
+  return html
 
 # Generate HTML table from data
 html_table = generate_html_table(data)
 
 # Write HTML table to file
 with open('index.html', 'w') as f:
-    f.write(html_table)
+  f.write(html_table)
