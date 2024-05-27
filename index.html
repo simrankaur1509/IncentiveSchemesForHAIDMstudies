@@ -12,6 +12,7 @@
     <script>
     $(document).ready(function() {
         $('#example').DataTable({
+            "order": [[2, 'asc'], [3, 'asc']],  // Default sorting by the third column (year) and fourth column (venue)
             "columnDefs": [
                 { "type": "num", "targets": 3 },  // Adjust the index for "year"
                 { "type": "string", "targets": 2 }  // Adjust the index for "venue"
