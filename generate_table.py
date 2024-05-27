@@ -4,15 +4,16 @@ import json
 # Directory where JSON files are stored
 json_dir = 'Incentive Scheme Data'
 
-# List to hold data from each JSON file
-data = []
+# Function to read all JSON files from directory
+def read_json_files(directory):
+    data = []
+    for filename in os.listdir(directory):
+        if filename.endswith('.json'):
+            with open(os.path.join(directory, filename)) as f:
+                data.append(json.load(f))
+    return data
 
-# Iterate over all JSON files and read data
-for json_file in os.listdir(json_dir):
-    if json_file.endswith('.json'):
-        with open(os.path.join(json_dir, json_file)) as f:
-            data.append(json.load(f))
-
+# Function to extract headers recursively
 def extract_headers(data):
     headers = {}
 
@@ -32,6 +33,7 @@ def extract_headers(data):
     add_to_headers(data[0])
     return headers
 
+# Function to generate HTML table
 def generate_html_table(data):
     headers = extract_headers(data)
     
@@ -65,8 +67,8 @@ def generate_html_table(data):
         if subkeys:
             for subkey, nested_subkeys in subkeys.items():
                 if nested_subkeys:
-                    col_span = count_nested_keys(nested_subkeys)
-                    html += f'<th colspan="{col_span}">{key}.{subkey}</th>'
+                    html += f'<th colspan="{count_nested_keys(nested_subkeys)}">{key}</th>'
+                    html += generate_nested_header(subkey, nested_subkeys)
                 else:
                     html += f'<th>{key}.{subkey}</th>'
         else:
@@ -78,7 +80,7 @@ def generate_html_table(data):
         if subkeys:
             for subkey, nested_subkeys in subkeys.items():
                 if nested_subkeys:
-                    html += generate_nested_header(subkey, nested_subkeys)
+                    html += generate_nested_header('', nested_subkeys)
                 else:
                     html += f'<th>{subkey}</th>'
         else:
@@ -110,7 +112,7 @@ def generate_html_table(data):
     <script>
     $(document).ready(function() {
         $('#example').DataTable({
-            "order": [[2, 'asc']],  // Default sorting by the third column (year)
+            "order": [[2, 'asc'], [3, 'asc']],  // Default sorting by the third column (year) and fourth column (venue)
             "columnDefs": [
                 { "orderable": true, "targets": [2, 3] },  // "year" and "venue" columns
                 { "orderable": false, "targets": "_all" }
@@ -123,6 +125,7 @@ def generate_html_table(data):
     '''
     return html
 
+# Function to count nested keys
 def count_nested_keys(nested_dict):
     count = 0
     for key, value in nested_dict.items():
@@ -132,15 +135,17 @@ def count_nested_keys(nested_dict):
             count += 1
     return count
 
+# Function to generate nested header rows
 def generate_nested_header(parent_key, nested_dict):
     html = ''
     for key, value in nested_dict.items():
         if isinstance(value, dict):
             html += generate_nested_header(f"{parent_key}.{key}", value)
         else:
-            html += f'<th>{key}</th>'
+            html += f'<th>{parent_key}.{key}</th>'
     return html
 
+# Function to generate nested cells for table rows
 def generate_nested_cells(record, keys, nested_dict):
     nested_record = get_nested_record(record, keys)
     html = ''
@@ -151,10 +156,14 @@ def generate_nested_cells(record, keys, nested_dict):
             html += f'<td>{nested_record.get(key, "")}</td>'
     return html
 
+# Function to get nested record value
 def get_nested_record(record, keys):
     for key in keys:
         record = record.get(key, {})
     return record
+
+# Read JSON data from directory
+data = read_json_files(json_dir)
 
 # Generate HTML table from data
 html_table = generate_html_table(data)
